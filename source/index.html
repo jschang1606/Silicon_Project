@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Follow 11₂ + 01₂ through a half adder, a full adder, and column addition.">
+  <title>11₂ + 01₂ | Binary Adder Lab</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='white'/%3E%3Cpath d='M12 21h14m0-10v20c0 8 5 12 13 12h3c8 0 12-5 12-11s-4-11-12-11H26' fill='none' stroke='%236339ae' stroke-width='6'/%3E%3C/svg%3E">
+  <style>
+    :root{--ink:#171923;--muted:#626a79;--line:#dce1e9;--paper:#fff;--soft:#f7f9fc;--purple:#6339ae;--blue:#087bb5;--green:#007a42;--green-light:#e9f8ef;--result:#bd2430}
+    *{box-sizing:border-box}
+    html{color-scheme:light}
+    body{margin:0;background:#fff;color:var(--ink);font-family:Inter,Arial,Helvetica,sans-serif;font-size:16px;line-height:1.45}
+    button{font:inherit}
+    button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+    .app{max-width:1500px;margin:auto;padding:20px 26px 32px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:22px;margin-bottom:16px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{height:45px;width:45px;border:2px solid var(--purple);border-radius:12px;display:grid;place-items:center;color:var(--purple);font:bold 21px monospace}
+    .eyebrow{color:var(--purple);font:800 12px monospace;letter-spacing:.11em;text-transform:uppercase}
+    h1{font-size:clamp(21px,2.3vw,30px);letter-spacing:-.035em;line-height:1.12;margin:4px 0 0}
+    .subtitle{color:var(--muted);font-size:14px;text-align:right}
+    .controls{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--soft);border:1px solid var(--line);border-radius:14px;margin-bottom:14px}
+    .control-label{font-weight:800;margin-right:auto}
+    .step-count{color:var(--muted);font:750 13px monospace;margin-right:7px}
+    .btn{border:1px solid var(--line);border-radius:10px;padding:10px 15px;background:#fff;color:var(--ink);font-weight:750;cursor:pointer}
+    .btn:hover{border-color:var(--purple)}
+    .btn.primary{background:var(--purple);border-color:var(--purple);color:#fff;min-width:120px}
+    .btn:disabled{opacity:.4;cursor:default}
+    .grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:14px;align-items:stretch}
+    .panel{min-width:0;border:1px solid var(--line);border-radius:16px;background:var(--paper);overflow:hidden}
+    .panel-header{padding:15px 18px 13px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .panel-header h2{font-size:18px;margin:0 0 3px}
+    .panel-header p{font-size:14px;color:var(--muted);margin:0}
+    .number{flex:none;width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:white;font:bold 13px monospace}
+    .diagram-scroll{overflow-x:auto}
+    svg{display:block;width:100%;min-width:690px;height:auto;background:#fff}
+    .board{fill:#fff;stroke:var(--line);stroke-width:2}
+    .board.active{fill:#fff;stroke:var(--ink);stroke-width:3}
+    .board-title{font:800 18px Arial;fill:var(--ink)}
+    .board-note{font:700 13px Arial;fill:var(--muted)}
+    .wire{fill:none;stroke:#b4becb;stroke-width:4;stroke-linejoin:round;stroke-linecap:round;transition:stroke .2s}
+    .wire.a.on{stroke:var(--purple)}
+    .wire.b.on{stroke:var(--blue)}
+    .wire.carry.on{stroke:var(--green)}
+    .wire.result.on{stroke:var(--result)}
+    .wire.other.on{stroke:var(--ink)}
+    .wire.current{stroke-dasharray:8 7;animation:move .6s linear infinite}
+    @keyframes move{to{stroke-dashoffset:-15}}
+    .gate-shape{fill:#fff;stroke:#768296;stroke-width:2.5}
+    .gate.on .gate-shape{fill:#fff;stroke:var(--ink)}
+    .gate.carry.on .gate-shape{fill:var(--green-light);stroke:var(--green)}
+    .gate.current .gate-shape{fill:#fff!important;stroke:var(--ink)!important;stroke-width:3.5}
+    .gate-name{font:800 15px monospace;fill:var(--ink);text-anchor:middle}
+    .gate-value{font:750 12px monospace;fill:var(--muted);text-anchor:middle;opacity:0}
+    .gate.on .gate-value,.gate.current .gate-value{opacity:1}
+    .gate-value .result-number{fill:var(--result);font-weight:900}
+    .gate-value .result-number.carry,.callout .result-number{fill:var(--green)}
+    .gate-value .result-number.other{fill:var(--ink)}
+    .value-backdrop{opacity:0;fill:var(--result)}
+    .value-backdrop.carry{fill:var(--green)}
+    .value-backdrop.other{fill:var(--ink)}
+    .gate.current .value-backdrop{opacity:1}
+    .gate.current .gate-value .result-number{fill:#fff}
+    .gate.reused .value-backdrop.other{opacity:1}
+    .gate.reused .gate-value .result-number.other{fill:#fff}
+    .signal{fill:#fff;stroke:#aeb8c7;stroke-width:2.5}
+    .signal.on{fill:var(--purple);stroke:var(--purple)}
+    .signal.input-a:not(.on){stroke:var(--purple)}
+    .signal.input-b.on{fill:var(--blue);stroke:var(--blue)}
+    .signal.input-b:not(.on){stroke:var(--blue)}
+    .signal.carry.on{fill:var(--green);stroke:var(--green)}
+    .signal.selected{stroke-width:4}
+    .signal-number{font:bold 18px monospace;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+    .signal.on + .signal-number{fill:#fff}
+    .signal.input-a:not(.on) + .signal-number{fill:var(--purple)}
+    .signal.input-b:not(.on) + .signal-number{fill:var(--blue)}
+    .output-node .signal-number{opacity:0}
+    .output-node.revealed .signal{fill:#fff;stroke:var(--result)}
+    .output-node.revealed .signal-number{opacity:1;fill:var(--result)}
+    .output-node.carry.revealed .signal{stroke:var(--green)}
+    .output-node.carry.revealed .signal-number{fill:var(--green)}
+    .output-node.current.revealed .signal{fill:var(--result)}
+    .output-node.carry.current.revealed .signal{fill:var(--green)}
+    .output-node.current.revealed .signal-number{fill:#fff}
+    .callout{opacity:0}
+    .callout.revealed{opacity:1}
+    .small-label{font:750 13px Arial;fill:#4d5563}
+    .small-label.input-a{fill:var(--purple)}
+    .small-label.input-b{fill:var(--blue)}
+    .small-label.sum{fill:var(--result)}
+    .small-label.carry{fill:var(--green)}
+    .small-label.final-result{fill:var(--result)}
+    .callout{font:800 15px Arial;fill:var(--green)}
+    .right{display:flex;flex-direction:column}
+    .right-content{padding:16px;display:flex;flex:1;flex-direction:column;gap:12px}
+    .addition{border:1px solid var(--line);border-radius:14px;background:#fff;padding:19px 14px 16px}
+    .place-names{display:grid;grid-template-columns:repeat(3,67px);justify-content:center;text-align:center;color:var(--muted);font:800 12px Arial;text-transform:uppercase;letter-spacing:.06em}
+    .columns{position:relative;width:201px;margin:4px auto 0;display:grid;grid-template-columns:repeat(3,67px);text-align:center;font:bold 39px/1.25 monospace}
+    .input-links{position:absolute;inset:0;width:100%;min-width:0;height:100%;background:transparent;overflow:visible;pointer-events:none;z-index:2}
+    .input-links path{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .input-links text{font:800 11px Arial, sans-serif;fill:var(--ink);text-anchor:middle}
+    .row-label{position:absolute;right:-32px;font:800 14px/1 monospace}
+    .row-label.a{top:91px;color:var(--purple)}
+    .row-label.b{top:140px;color:var(--blue)}
+    .columns .blank{visibility:hidden}
+    .input-bit{border:2px solid transparent;border-radius:8px;transition:background .2s,border-color .2s}
+    .input-bit.a{color:var(--purple)}
+    .input-bit.b{color:var(--blue)}
+    .input-bit.a.active{background:var(--purple);border-color:var(--purple);color:#fff}
+    .input-bit.b.active{background:var(--blue);border-color:var(--blue);color:#fff}
+    .carry-row{height:76px;font-size:23px;line-height:36px;color:var(--green)}
+    .carry-stack{display:flex;flex-direction:column;gap:4px}
+    .carry-stack.final{justify-content:center}
+    #carryInDisplay{height:36px;align-self:center;display:flex;align-items:center;justify-content:center}
+    .carry-digit{border-radius:7px}
+    .carry-digit.highlight{background:var(--green);color:#fff}
+    .carry-candidate{display:flex;flex-direction:column;align-items:center;justify-content:center;height:36px;line-height:1;outline:1px solid var(--green);outline-offset:-1px}
+    .carry-candidate[hidden]{display:none}
+    .carry-candidate small{font:750 9px/1 Arial}
+    .carry-candidate span{font:bold 23px/1 monospace}
+    .final-carry-value{height:36px;display:flex;align-items:center;justify-content:center;color:var(--green);font:bold 23px/1 monospace}
+    .final-carry-value[hidden]{display:none}
+    .operator{position:absolute;left:-25px;top:135px;font:600 32px/1 monospace}
+    .bar{height:3px;background:var(--ink);grid-column:1/-1;margin:6px 0 9px}
+    .answer{min-height:50px}
+    .answer span{display:block;border-radius:8px}
+    .answer .sum,.answer .carry{color:var(--result)}
+    .columns.completed .answer .sum,.columns.completed .answer .carry{color:var(--result)}
+    .answer .pending{color:#c3c9d2}
+    .answer .highlight{background:var(--result);color:#fff!important}
+    .answer #answer2.highlight{font-size:32px;line-height:1.15;padding:3px 0 2px}
+    .answer #answer2.highlight::after{content:"OR";display:block;font:800 10px/1.1 Arial}
+    .read-result{text-align:center;font-size:14px;color:var(--muted);margin-top:12px}
+    .read-result strong{color:var(--ink);font:800 20px monospace}
+    .read-result.completed strong{color:var(--result)}
+    .work-row{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,67px);height:62px;align-items:center;margin:3px 0}
+    .work-row[hidden]{display:none}
+    .work-chip{grid-column:2;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:8px;background:var(--ink);color:#fff;height:58px}
+    .work-chip small{font:750 10px/1.2 Arial;white-space:nowrap}
+    .work-chip strong{font:850 29px/1.15 monospace}
+    .work-chip.result{border-color:var(--result);background:var(--result)}
+    .work-chip.carry{border-color:var(--green);background:var(--green)}
+    .steps{display:grid;gap:5px}
+    .step{width:100%;text-align:left;display:grid;grid-template-columns:25px 1fr;gap:9px;align-items:center;padding:6px 9px;border:1px solid var(--line);background:#fff;border-radius:9px;cursor:pointer;color:var(--muted)}
+    .step:hover{border-color:#b09ad1}
+    .step.active{border-color:var(--ink);background:var(--soft);color:var(--ink)}
+    .step.done{border-color:var(--line);background:var(--soft);color:var(--ink)}
+    .step-number{width:24px;height:24px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font:bold 12px monospace}
+    .step strong{display:block;font-size:14px}
+    .step small{display:block;font-size:12px;line-height:1.3;margin-top:1px}
+    .step small[hidden]{display:none}
+    .explanation{padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--soft);min-height:78px}
+    .explanation strong{font-size:14px}
+    .explanation p{font-size:14px;color:#4f5968;margin:5px 0 0}
+    .legend{display:flex;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-top:auto}
+    .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+    .legend .a{background:var(--purple)}.legend .b{background:var(--blue)}.legend .carry{background:var(--green)}.legend .result{background:var(--result)}.legend .other{background:var(--ink)}
+    .site-footer{margin-top:16px;text-align:right;color:var(--muted);font-size:12px}
+    @media(max-width:1120px){.grid{grid-template-columns:1fr}.right-content{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(290px,1.2fr);align-items:start}.addition{grid-row:span 2}.legend{grid-column:1/-1}}
+    @media(max-width:700px){.app{padding:13px 10px 25px}.subtitle{display:none}.controls{flex-wrap:wrap}.control-label{width:100%}.step-count{margin-right:auto}.right-content{display:flex}.diagram-scroll svg{min-width:690px}}
+    @media(prefers-reduced-motion:reduce){.wire.current{animation:none}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="brand"><div class="logo" aria-hidden="true">Σ</div><div><div class="eyebrow">Interactive Logic Lab</div><h1>11₂ + 01₂: How the Adders Work Together</h1></div></div>
+    <div class="subtitle">Follow the same calculation in the circuit and in column addition.</div>
+  </header>
+  <nav class="controls" aria-label="Demonstration controls">
+    <span class="control-label">Trace each gate</span><span class="step-count" id="stepCount">Step 0 of 9</span>
+    <button class="btn" id="previous" disabled>Previous</button><button class="btn primary" id="next">Start</button><button class="btn" id="reset">Reset</button>
+  </nav>
+  <div class="grid">
+    <section class="panel" aria-labelledby="circuitHeading">
+      <div class="panel-header"><div><h2 id="circuitHeading">Logic-gate circuit</h2><p>Lower bit → Half Adder → carry → upper bit → Full Adder</p></div><span class="number">1</span></div>
+      <div class="diagram-scroll">
+        <svg id="circuit" viewBox="0 0 850 850" role="img" aria-labelledby="circuitTitle circuitDesc">
+          <title id="circuitTitle">A half adder connected to a full adder</title>
+          <desc id="circuitDesc">The lower bits 1 and 1 enter a half adder, giving sum 0 and carry 1. The upper bits 1 and 0 plus that carry enter a full adder, giving sum 0 and final carry 1.</desc>
+          <rect id="halfBoard" class="board" x="18" y="16" width="814" height="295" rx="16"/>
+          <text class="board-title" x="39" y="49">1. HALF ADDER · lower (2⁰) column</text>
+          <text class="board-note" x="39" y="71">Inputs: A₀ = 1, B₀ = 1</text>
+          <rect id="fullBoard" class="board" x="18" y="383" width="814" height="445" rx="16"/>
+          <text class="board-title" x="39" y="416">2. FULL ADDER · upper (2¹) column</text>
+          <text class="board-note" x="39" y="438">Inputs: A₁ = 1, B₁ = 0, plus carry from below</text>
+          <path id="haAtoX" class="wire a" d="M100 125 H258"/>
+          <path id="haBtoX" class="wire b" d="M100 245 H168 V165 H258"/>
+          <path id="haAtoAnd" class="wire a" d="M155 125 V239 H258"/>
+          <path id="haBtoAnd" class="wire b" d="M100 245 H258"/>
+          <path id="haSumWire" class="wire result" d="M367 146 H733"/>
+          <path id="haCarryWire" class="wire carry" d="M367 249 H465"/>
+          <path id="haCarryTransfer" class="wire carry" d="M509 249 H523 V625 H556"/>
+          <path id="haCarryBranch" class="wire carry" d="M523 625 V714 H556"/>
+          <text id="carryCallout" class="callout" x="492" y="350">C₁ = <tspan class="result-number">1</tspan> →</text>
+          <g id="haXor" class="gate"><path class="gate-shape" d="M258 103 Q290 146 258 189 Q323 183 367 146 Q323 109 258 103 Z"/><path class="gate-shape" d="M247 103 Q280 146 247 189" fill="none"/><text class="gate-name" x="315" y="146">XOR</text><rect class="value-backdrop" x="322" y="151" width="15" height="17" rx="3"/><text class="gate-value" x="315" y="164">1⊕1=<tspan class="result-number">0</tspan></text></g>
+          <g id="haAnd" class="gate carry"><path class="gate-shape" d="M258 205 H313 A44 44 0 0 1 313 293 H258 Z"/><text class="gate-name" x="309" y="248">AND</text><rect class="value-backdrop carry" x="316" y="254" width="15" height="17" rx="3"/><text class="gate-value" x="309" y="267">1·1=<tspan class="result-number carry">1</tspan></text></g>
+          <g><circle id="circuitA0" class="signal input-a on" cx="78" cy="125" r="22"/><text class="signal-number" x="78" y="125">1</text><text class="small-label input-a" x="52" y="96">A₀</text></g>
+          <g><circle id="circuitB0" class="signal input-b on" cx="78" cy="245" r="22"/><text class="signal-number" x="78" y="245">1</text><text class="small-label input-b" x="52" y="216">B₀</text></g>
+          <g id="s0Node" class="output-node"><circle id="s0Circle" class="signal" cx="755" cy="146" r="22"/><text class="signal-number" x="755" y="146">0</text><text class="small-label sum" x="782" y="151">S₀</text></g>
+          <g id="c1Node" class="output-node carry"><circle id="c1Circle" class="signal carry" cx="487" cy="249" r="22"/><text class="signal-number" x="487" y="249">1</text><text class="small-label carry" x="518" y="255">C₁</text></g>
+          <path id="faAtoX" class="wire a" d="M100 510 H258"/>
+          <path id="faBtoX" class="wire b" d="M100 596 H172 V550 H258"/>
+          <path id="faAtoAnd" class="wire a" d="M160 510 V745 H258"/>
+          <path id="faBtoAnd" class="wire b" d="M172 596 V783 H258"/>
+          <path id="faXtoX" class="wire other" d="M367 530 H475 V592 H556"/>
+          <path id="faXtoAnd" class="wire other" d="M475 592 V681 H556"/>
+          <path id="faSumWire" class="wire result" d="M662 605 H733"/>
+          <path id="faAnd1toOr" class="wire other" d="M367 763 H685 V746 H724"/>
+          <path id="faAnd2toOr" class="wire other" d="M662 708 H685 V765 H724"/>
+          <path id="faCarryOutWire" class="wire result" d="M780 755 H798"/>
+          <g id="faXor1" class="gate"><path class="gate-shape" d="M258 487 Q290 530 258 573 Q323 567 367 530 Q323 493 258 487 Z"/><path class="gate-shape" d="M247 487 Q280 530 247 573" fill="none"/><text class="gate-name" x="315" y="529">XOR</text><rect class="value-backdrop other" x="322" y="535" width="15" height="17" rx="3"/><text class="gate-value" x="315" y="548">1⊕0=<tspan class="result-number other">1</tspan></text></g>
+          <g id="faAnd1" class="gate carry"><path class="gate-shape" d="M258 718 H313 A44 44 0 0 1 313 806 H258 Z"/><text class="gate-name" x="309" y="761">AND</text><rect class="value-backdrop other" x="316" y="767" width="15" height="17" rx="3"/><text class="gate-value" x="309" y="780">1·0=<tspan class="result-number other">0</tspan></text></g>
+          <g id="faXor2" class="gate"><path class="gate-shape" d="M556 562 Q588 605 556 648 Q620 642 662 605 Q620 568 556 562 Z"/><path class="gate-shape" d="M545 562 Q578 605 545 648" fill="none"/><text class="gate-name" x="612" y="604">XOR</text><rect class="value-backdrop" x="619" y="610" width="15" height="17" rx="3"/><text class="gate-value" x="612" y="623">1⊕1=<tspan class="result-number">0</tspan></text></g>
+          <g id="faAnd2" class="gate carry"><path class="gate-shape" d="M556 666 H610 A42 42 0 0 1 610 750 H556 Z"/><text class="gate-name" x="605" y="707">AND</text><rect class="value-backdrop other" x="612" y="713" width="15" height="17" rx="3"/><text class="gate-value" x="605" y="726">1·1=<tspan class="result-number other">1</tspan></text></g>
+          <g id="faOr" class="gate carry"><path class="gate-shape" d="M724 717 Q746 755 724 793 Q754 790 780 755 Q754 720 724 717 Z"/><text class="gate-name" x="749" y="755">OR</text><rect class="value-backdrop" x="756" y="760" width="15" height="17" rx="3"/><text class="gate-value" x="749" y="773">0∨1=<tspan class="result-number">1</tspan></text></g>
+          <g><circle id="circuitA1" class="signal input-a on" cx="78" cy="510" r="22"/><text class="signal-number" x="78" y="510">1</text><text class="small-label input-a" x="52" y="481">A₁</text></g>
+          <g><circle id="circuitB1" class="signal input-b" cx="78" cy="596" r="22"/><text class="signal-number" x="78" y="596">0</text><text class="small-label input-b" x="52" y="568">B₁</text></g>
+          <g id="s1Node" class="output-node"><circle id="s1Circle" class="signal" cx="755" cy="605" r="22"/><text class="signal-number" x="755" y="605">0</text><text class="small-label sum" x="782" y="610">S₁</text></g>
+          <g id="c2Node" class="output-node"><circle id="c2Circle" class="signal carry" cx="815" cy="755" r="17"/><text class="signal-number" x="815" y="755">1</text></g>
+          <text class="small-label final-result" x="671" y="817">C₂ (final carry)</text>
+        </svg>
+      </div>
+    </section>
+    <section class="panel right" aria-labelledby="additionHeading">
+      <div class="panel-header"><div><h2 id="additionHeading">Binary addition</h2><p>Compute from right to left, one bit position at a time.</p></div><span class="number">2</span></div>
+      <div class="right-content">
+        <div class="addition">
+          <div class="place-names"><span>4s</span><span>2s</span><span>1s</span></div>
+          <div class="columns" id="additionColumns" aria-label="11 base two plus 01 base two equals 100 base two">
+            <svg class="input-links" aria-hidden="true"><path id="inputLinkPath"/><g id="inputOperation" visibility="hidden"><rect id="inputOperationBg" rx="3" fill="#fff"/><text id="inputOperationText">XOR</text></g></svg>
+            <div class="carry-row carry-stack" id="carryStack"><div class="carry-digit carry-candidate" id="carryCandidate" hidden aria-label="P equals 0, the first carry candidate"><small>P</small><span>0</span></div><div class="carry-digit carry-candidate" id="carryCandidateQ" hidden aria-label="Q equals 1, the second carry candidate"><small>Q</small><span>1</span></div><div class="final-carry-value" id="carryFinal" hidden aria-label="Final carry equals 1">1</div></div><div class="carry-row carry-digit" id="carryInDisplay">·</div><div class="carry-row"></div>
+            <span class="blank">0</span><span id="a1Digit" class="input-bit a">1</span><span id="a0Digit" class="input-bit a">1</span>
+            <span class="operator">+</span><span class="row-label a">A</span><span class="row-label b">B</span><span class="blank">0</span><span id="b1Digit" class="input-bit b">0</span><span id="b0Digit" class="input-bit b">1</span>
+            <div class="work-row" id="workRow" hidden aria-live="polite">
+              <span class="work-chip" id="workChip"><small id="workLabel">X · XOR₁</small><strong id="workDigit">1</strong></span>
+            </div>
+            <div class="bar"></div>
+            <div class="answer"><span class="pending" id="answer2">?</span></div>
+            <div class="answer"><span class="pending" id="answer1">?</span></div>
+            <div class="answer"><span class="pending" id="answer0">?</span></div>
+          </div>
+          <div class="read-result" id="readResult">11₂ + 01₂ = <strong>?</strong></div>
+        </div>
+        <div class="steps" aria-label="Addition steps">
+          <button class="step" data-step="1"><span class="step-number">1</span><span><strong>Half Adder · XOR</strong><small>1 ⊕ 1 → S₀ = 0</small></span></button>
+          <button class="step" data-step="2"><span class="step-number">2</span><span><strong>Half Adder · AND</strong><small>1 AND 1 → C₁ = 1</small></span></button>
+          <button class="step" data-step="3"><span class="step-number">3</span><span><strong>Carry to the upper column</strong><small>C₁ = 1 enters the Full Adder.</small></span></button>
+          <button class="step" data-step="4"><span class="step-number">4</span><span><strong>Full Adder · XOR₁</strong><small>A₁ ⊕ B₁ → X = 1</small></span></button>
+          <button class="step" data-step="5"><span class="step-number">5</span><span><strong>Full Adder · XOR₂</strong><small>X ⊕ C₁ → S₁ = 0</small></span></button>
+          <button class="step" data-step="6"><span class="step-number">6</span><span><strong>Full Adder · AND₁</strong><small>A₁ AND B₁ → P = 0 in the 4s carry position</small></span></button>
+          <button class="step" data-step="7"><span class="step-number">7</span><span><strong>Full Adder · AND₂</strong><small>X AND C₁ → Q = 1 below P in the 4s carry position</small></span></button>
+          <button class="step" data-step="8"><span class="step-number">8</span><span><strong>Full Adder · OR</strong><small>P OR Q → C₂ = 1</small></span></button>
+          <button class="step" data-step="9"><span class="step-number">9</span><span><strong>Read the result</strong><small>C₂ S₁ S₀ = 100₂</small></span></button>
+        </div>
+        <div class="explanation" aria-live="polite"><strong id="explainTitle">Start with the rightmost bits</strong><p id="explainText">Select Start to trace the two adder circuits and the matching column addition.</p></div>
+        <div class="legend"><span><i class="a"></i>A</span><span><i class="b"></i>B</span><span><i class="carry"></i>Carry</span><span><i class="result"></i>Result</span><span><i class="other"></i>Other values</span></div>
+      </div>
+    </section>
+  </div>
+  <footer class="site-footer">© 2026 Jisu Jang · Dr. Kwon’s Lab, Instructional Systems Technology, Indiana University</footer>
+</main>
+<script>
+  let step=0;
+  const $=id=>document.getElementById(id);
+  const steps=[
+    ['Start with the rightmost bits','Select Start to trace one logic gate at a time.','Choose Start to trace the first gate.'],
+    ['Half Adder · XOR','A₀ = 1 and B₀ = 1. XOR gives 0, so write S₀ = 0 in the 1s column.','S₀ = 1 XOR 1 = 0'],
+    ['Half Adder · AND','The same inputs enter AND. Both are 1, so the carry C₁ is 1.','C₁ = 1 AND 1 = 1'],
+    ['Move the carry','The Half Adder sends C₁ = 1 to the upper column. It becomes the Full Adder’s third input.','Full Adder inputs: A₁ = 1, B₁ = 0, C₁ = 1'],
+    ['Full Adder · XOR₁','First, XOR compares A₁ = 1 and B₁ = 0. They differ, so the intermediate value X is 1.','X = 1 XOR 0 = 1'],
+    ['Full Adder · XOR₂','The second XOR compares X = 1 with C₁ = 1. They are equal, so S₁ is 0.','S₁ = 1 XOR 1 = 0'],
+    ['Full Adder · AND₁','AND checks A₁ = 1 and B₁ = 0. Write the carry candidate P = 0 in the 4s carry position. OR will later combine P with Q.','P = 1 AND 0 = 0'],
+    ['Full Adder · AND₂','The second AND checks X = 1 and C₁ = 1. Write the carry candidate Q = 1 below P in the 4s carry position.','Q = 1 AND 1 = 1'],
+    ['Full Adder · OR','OR combines the carry candidates P = 0 and Q = 1. One is 1, so the final carry C₂ is 1.','C₂ = 0 OR 1 = 1'],
+    ['Read the result','The final carry C₂ = 1 appears above the 4s column. Read C₂, S₁, and S₀ from left to right: 100₂, or 4 in decimal.','C₂ S₁ S₀ = 1 0 0 = 100₂']
+  ];
+  const workValues={4:['X · XOR₁','1'],5:['X · XOR₂','1'],7:['X · AND₂','1']};
+  const inputPairs={1:['a0Digit','b0Digit'],2:['a0Digit','b0Digit'],4:['a1Digit','b1Digit'],5:['carryInDisplay','workChip'],6:['a1Digit','b1Digit'],7:['carryInDisplay','workChip'],8:['carryCandidate','carryCandidateQ']};
+  const inputOperations={1:'XOR',2:'AND',4:'XOR₁',5:'XOR₂',6:'AND₁',7:'AND₂',8:'OR'};
+  function setClass(id,cls,on){$(id).classList.toggle(cls,on)}
+  function paint(id,available,current){setClass(id,'on',step>=available);setClass(id,'current',step===current)}
+  function drawInputLinks(){
+    const path=$('inputLinkPath');
+    const pair=inputPairs[step];
+    const operation=$('inputOperation');
+    if(!pair){path.setAttribute('d','');operation.setAttribute('visibility','hidden');return}
+    const nodes=pair.map($);
+    if(nodes.some(node=>node.hidden||!node.getBoundingClientRect)){path.setAttribute('d','');operation.setAttribute('visibility','hidden');return}
+    const column=$('additionColumns').getBoundingClientRect();
+    const right=step<=2;
+    const points=nodes.map(node=>{
+      const box=node.getBoundingClientRect();
+      return {x:(right?box.right:box.left)-column.left+(right?2:-2),y:(box.top+box.bottom)/2-column.top};
+    });
+    const tipX=right?Math.max(...points.map(p=>p.x))+17:Math.max(-20,Math.min(...points.map(p=>p.x))-32);
+    const midY=(points[0].y+points[1].y)/2;
+    const inset=right?5:-5;
+    path.setAttribute('d',points.map(p=>`M ${p.x} ${p.y} L ${p.x+inset} ${p.y} L ${tipX} ${midY}`).join(' '));
+    const label=inputOperations[step];
+    const labelWidth=label.length*7+8;
+    $('inputOperationText').textContent=label;
+    $('inputOperationText').setAttribute('x',tipX);
+    $('inputOperationText').setAttribute('y',midY+4);
+    for(const [key,value] of Object.entries({x:tipX-labelWidth/2,y:midY-9,width:labelWidth,height:18}))$('inputOperationBg').setAttribute(key,value);
+    operation.setAttribute('visibility','visible');
+  }
+  function render(){
+    $('stepCount').textContent='Step '+step+' of 9';
+    $('previous').disabled=step===0;
+    $('next').textContent=step===0?'Start':step===9?'Replay':'Next Gate';
+    $('explainTitle').textContent=steps[step][0];
+    $('explainText').textContent=steps[step][1];
+    $('workRow').hidden=!workValues[step];
+    if(workValues[step]){
+      $('workLabel').textContent=workValues[step][0];
+      $('workDigit').textContent=workValues[step][1];
+    }
+    for(const [id,active] of [
+      ['a0Digit',step===1||step===2],['b0Digit',step===1||step===2],
+      ['a1Digit',step===4||step===6],['b1Digit',step===4||step===6]
+    ])setClass(id,'active',active);
+    for(const [id,active] of [
+      ['circuitA0',step===1||step===2],['circuitB0',step===1||step===2],
+      ['circuitA1',step===4||step===6],['circuitB1',step===4||step===6],
+      ['c1Circle',step===3||step===5||step===7]
+    ])setClass(id,'selected',active);
+    for(const [id,active] of [
+      ['circuitA0',step===1||step===2],['circuitB0',step===1||step===2],
+      ['circuitA1',step===4||step===6],['circuitB1',step===4||step===6]
+    ])setClass(id,'on',active);
+    $('carryInDisplay').textContent=step>=2?'1':'·';
+    setClass('carryInDisplay','highlight',step===2||step===3||step===5||step===7);
+    $('carryCandidate').hidden=step<6||step>8;
+    setClass('carryCandidate','highlight',step===6||step===8);
+    $('carryCandidateQ').hidden=step<7||step>8;
+    setClass('carryCandidateQ','highlight',step===7||step===8);
+    $('carryFinal').hidden=step!==9;
+    setClass('carryStack','final',step===9);
+    for(const [id,shown,value,highlight] of [['answer0',step>=1,'0',step===1],['answer1',step>=5,'0',step===5],['answer2',step>=8,'1',step===8]]){
+      $(id).textContent=shown?value:'?';
+      setClass(id,'pending',!shown);
+      setClass(id,'sum',shown&&id!=='answer2');
+      setClass(id,'carry',shown&&id==='answer2');
+      setClass(id,'highlight',highlight);
+    }
+    $('readResult').innerHTML=step===9?'11₂ + 01₂ = <strong>100₂ = 4₁₀</strong>':'11₂ + 01₂ = <strong>?</strong>';
+    setClass('additionColumns','completed',step===9);
+    setClass('readResult','completed',step===9);
+    setClass('halfBoard','active',step===1||step===2);
+    setClass('fullBoard','active',step>=4&&step<=8);
+    for(const id of ['haAtoX','haBtoX','haSumWire','haXor'])paint(id,1,1);
+    for(const id of ['haAtoAnd','haBtoAnd','haCarryWire','haAnd'])paint(id,2,2);
+    for(const id of ['haCarryTransfer','haCarryBranch'])paint(id,3,3);
+    for(const id of ['faAtoX','faBtoX','faXor1'])paint(id,4,4);
+    for(const id of ['faXtoX','faSumWire','faXor2'])paint(id,5,5);
+    for(const id of ['faAtoAnd','faBtoAnd','faAnd1toOr','faAnd1'])paint(id,6,6);
+    for(const id of ['faXtoAnd','faAnd2toOr','faAnd2'])paint(id,7,7);
+    for(const id of ['faCarryOutWire','faOr'])paint(id,8,8);
+    setClass('faXor1','reused',step===5||step===7);
+    setClass('faAnd1','reused',step===8);
+    setClass('faAnd2','reused',step===8);
+    for(const [id,n] of [['s0Circle',1],['c1Circle',2],['s1Circle',5],['c2Circle',8]])setClass(id,'on',step>=n);
+    for(const [id,n] of [['s0Node',1],['c1Node',2],['s1Node',5],['c2Node',8]])setClass(id,'revealed',step>=n);
+    for(const [id,active] of [['s0Node',step===1],['c1Node',step===2||step===3],['s1Node',step===5],['c2Node',step===8]])setClass(id,'current',active);
+    setClass('carryCallout','revealed',step>=2);
+    document.querySelectorAll('.step').forEach(el=>{let n=Number(el.dataset.step);el.classList.toggle('active',n===step);el.classList.toggle('done',n<step);el.setAttribute('aria-current',n===step?'step':'false');const hint=el.querySelector('small');if(hint){hint.hidden=n>step;}});
+    drawInputLinks();
+  }
+  $('next').onclick=()=>{step=step===9?0:step+1;render()};
+  $('previous').onclick=()=>{step=Math.max(0,step-1);render()};
+  $('reset').onclick=()=>{step=0;render()};
+  document.querySelectorAll('.step').forEach(el=>el.onclick=()=>{step=Number(el.dataset.step);render()});
+  document.addEventListener('keydown',e=>{if(e.target.tagName==='BUTTON')return;if(e.key==='ArrowRight'){step=Math.min(9,step+1);render()}if(e.key==='ArrowLeft'){step=Math.max(0,step-1);render()}});
+  if(typeof window!=='undefined')window.addEventListener('resize',drawInputLinks);
+  if(document.modelContext?.registerTool){document.modelContext.registerTool({name:'show_addition_step',title:'Show addition step',description:'Show one logic-gate step of the 11₂ + 01₂ circuit demonstration.',inputSchema:{type:'object',properties:{step:{type:'integer',minimum:0,maximum:9}},required:['step'],additionalProperties:false},annotations:{readOnlyHint:false},execute(input){if(!Number.isInteger(input.step)||input.step<0||input.step>9)throw Error('Step must be 0–9');step=input.step;render();return{step,title:steps[step][0],result:step===9?'100₂':'pending'}}})}
+  render();
+</script>
+</body>
+</html>

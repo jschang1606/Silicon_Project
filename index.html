@@ -186,12 +186,14 @@
           <text class="board-title" x="39" y="416">2. FULL ADDER · upper (2¹) column</text>
           <text class="board-note" x="39" y="438">Inputs: A₁ = 1, B₁ = 0, plus carry from below</text>
           <path id="haAtoX" class="wire a" d="M100 125 H258"/>
-          <path id="haBtoX" class="wire b" d="M100 245 H168 V165 H258"/>
+          <path id="haBtoX" class="wire b" d="M168 245 V165 H258"/>
           <path id="haAtoAnd" class="wire a" d="M155 125 V239 H258"/>
-          <path id="haBtoAnd" class="wire b" d="M100 245 H258"/>
+          <path id="haBtoAnd" class="wire b" d="M168 245 H258"/>
+          <path id="haB0Trunk" class="wire b" d="M100 245 H168"/>
           <path id="haSumWire" class="wire result" d="M367 146 H733"/>
           <path id="haCarryWire" class="wire carry" d="M367 249 H465"/>
-          <path id="haCarryTransfer" class="wire carry" d="M509 249 H523 V625 H556"/>
+          <path id="haCarryTransfer" class="wire carry" d="M509 249 H523 V625"/>
+          <path id="haCarryToXor2" class="wire carry" d="M523 625 H556"/>
           <path id="haCarryBranch" class="wire carry" d="M523 625 V714 H556"/>
           <text id="carryCallout" class="callout" x="492" y="350">C₁ = <tspan class="result-number">1</tspan> →</text>
           <g id="haXor" class="gate"><path class="gate-shape" d="M258 103 Q290 146 258 189 Q323 183 367 146 Q323 109 258 103 Z"/><path class="gate-shape" d="M247 103 Q280 146 247 189" fill="none"/><text class="gate-name" x="315" y="146">XOR</text><rect class="value-backdrop" x="322" y="151" width="15" height="17" rx="3"/><text class="gate-value" x="315" y="164">1⊕1=<tspan class="result-number">0</tspan></text></g>
@@ -204,7 +206,8 @@
           <path id="faBtoX" class="wire b" d="M100 596 H172 V550 H258"/>
           <path id="faAtoAnd" class="wire a" d="M160 510 V745 H258"/>
           <path id="faBtoAnd" class="wire b" d="M172 596 V783 H258"/>
-          <path id="faXtoX" class="wire other" d="M367 530 H475 V592 H556"/>
+          <path id="faXtoX" class="wire other" d="M367 530 H475 V592"/>
+          <path id="faXtoXBranch" class="wire other" d="M475 592 H556"/>
           <path id="faXtoAnd" class="wire other" d="M475 592 V681 H556"/>
           <path id="faSumWire" class="wire result" d="M662 605 H733"/>
           <path id="faAnd1toOr" class="wire other" d="M367 763 H685 V746 H724"/>
@@ -351,10 +354,15 @@
     setClass('halfBoard','active',step===1||step===2);
     setClass('fullBoard','active',step>=4&&step<=8);
     for(const id of ['haAtoX','haBtoX','haSumWire','haXor'])paint(id,1,1);
+    paint('haB0Trunk',1,step===2?2:1);
     for(const id of ['haAtoAnd','haBtoAnd','haCarryWire','haAnd'])paint(id,2,2);
-    for(const id of ['haCarryTransfer','haCarryBranch'])paint(id,3,3);
+    for(const id of ['haCarryTransfer','haCarryToXor2','haCarryBranch'])paint(id,3,3);
+    setClass('haCarryTransfer','current',step===3||step===5||step===7);
+    setClass('haCarryToXor2','current',step===3||step===5);
+    setClass('haCarryBranch','current',step===3||step===7);
     for(const id of ['faAtoX','faBtoX','faXor1'])paint(id,4,4);
-    for(const id of ['faXtoX','faSumWire','faXor2'])paint(id,5,5);
+    for(const id of ['faXtoX','faXtoXBranch','faSumWire','faXor2'])paint(id,5,5);
+    setClass('faXtoX','current',step===5||step===7);
     for(const id of ['faAtoAnd','faBtoAnd','faAnd1toOr','faAnd1'])paint(id,6,6);
     for(const id of ['faXtoAnd','faAnd2toOr','faAnd2'])paint(id,7,7);
     for(const id of ['faCarryOutWire','faOr'])paint(id,8,8);

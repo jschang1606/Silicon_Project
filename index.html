@@ -218,7 +218,7 @@
       .panel-header p{font-size:14px;line-height:1.4}
       .diagram-scroll svg{min-width:0;width:100%}
       .right-content{display:flex;padding:10px;gap:12px}
-      .addition{padding:16px 8px;overflow-x:auto}
+      .addition{padding:16px 8px;overflow:visible}
       .addition .place-names,.addition .columns{position:relative;left:0}
       .steps{gap:7px}
       .step{min-height:48px;padding:10px}
@@ -359,6 +359,16 @@
   function setClass(id,cls,on){$(id).classList.toggle(cls,on)}
   function paint(id,available,current){setClass(id,'on',step>=available);setClass(id,'current',step===current)}
   function drawInputLinks(){
+    const columns=$('additionColumns');
+    const addition=columns.closest('.addition');
+    // Reserve room on both sides for gate labels and curved result arrows.
+    const available=addition.clientWidth-16;
+    const scale=window.matchMedia('(max-width:700px)').matches?Math.min(1,available/405):1;
+    columns.style.zoom=String(scale);
+    const localBox=node=>{
+      const box=node.getBoundingClientRect();
+      return {left:box.left/scale,right:box.right/scale,top:box.top/scale,bottom:box.bottom/scale};
+    };
     const path=$('inputLinkPath');
     const pair=inputPairs[step];
     const operation=$('inputOperation');
@@ -367,10 +377,10 @@
     if(!pair){path.setAttribute('d','');operation.setAttribute('visibility','hidden');return}
     const nodes=pair.map($);
     if(nodes.some(node=>node.hidden||!node.getBoundingClientRect)){path.setAttribute('d','');operation.setAttribute('visibility','hidden');return}
-    const column=$('additionColumns').getBoundingClientRect();
+    const column=localBox(columns);
     const right=step<=2;
     const points=nodes.map(node=>{
-      const box=node.getBoundingClientRect();
+      const box=localBox(node);
       return {x:(right?box.right:box.left)-column.left+(right?2:-2),y:(box.top+box.bottom)/2-column.top};
     });
     const tipX=right?Math.max(...points.map(p=>p.x))+42:Math.min(...points.map(p=>p.x))-48;
@@ -383,7 +393,7 @@
     $('inputOperationText').setAttribute('x',tipX);
     $('inputOperationText').setAttribute('y',midY+6);
     for(const [key,value] of Object.entries({x:tipX-labelWidth/2,y:midY-13,width:labelWidth,height:26}))$('inputOperationBg').setAttribute(key,value);
-    const result=$(operationResults[step]).getBoundingClientRect();
+    const result=localBox($(operationResults[step]));
     const endX=(right?result.right+5:result.left-5)-column.left;
     const endY=(result.top+result.bottom)/2-column.top;
     const startY=midY+(endY>=midY?15:-15);

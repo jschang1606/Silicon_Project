@@ -50,8 +50,9 @@
     .gate-shape{fill:#fff;stroke:#768296;stroke-width:2.5}
     .gate.on .gate-shape{fill:#fff;stroke:var(--ink)}
     .gate.carry.on .gate-shape{fill:var(--green-light);stroke:var(--green)}
-    .gate.current .gate-shape{fill:#fff!important;stroke:var(--ink)!important;stroke-width:3.5}
-    .gate-name{font:800 15px monospace;fill:var(--ink);text-anchor:middle}
+    .gate.current .gate-shape{fill:#ffeb80!important;stroke:var(--ink)!important;stroke-width:3.5}
+    .gate.current .gate-shape[fill="none"]{fill:none!important}
+    .gate-name{font:800 23px monospace;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
     .gate-value{font:750 12px monospace;fill:var(--muted);text-anchor:middle;opacity:0}
     .gate.on .gate-value,.gate.current .gate-value{opacity:1}
     .gate-value .result-number{fill:var(--result);font-weight:900}
@@ -83,6 +84,20 @@
     .output-node.current.revealed .signal{fill:var(--result)}
     .output-node.carry.current.revealed .signal{fill:var(--green)}
     .output-node.current.revealed .signal-number{fill:#fff}
+    .temporary-node{visibility:hidden}
+    .temporary-node.revealed{visibility:visible}
+    .temporary-node .signal{fill:#111;stroke:#111}
+    .temporary-node .signal-number{fill:#fff}
+    .temporary-node.inactive .signal{fill:#fff}
+    .temporary-node.inactive .signal-number{fill:#111}
+    .temporary-node.carry .signal{fill:var(--green);stroke:var(--green)}
+    .temporary-node.carry.inactive .signal{fill:#fff}
+    .temporary-node.carry.inactive .signal-number{fill:var(--green)}
+    .completed-circuit .temporary-node .signal{fill:#fff}
+    .completed-circuit .temporary-node .signal-number{fill:#111}
+    .completed-circuit .temporary-node.carry .signal-number{fill:var(--green)}
+    .gate.reused .value-backdrop.carry{opacity:1}
+    .gate.reused .gate-value .result-number.carry{fill:#fff}
     .callout{opacity:0}
     .callout.revealed{opacity:1}
     .small-label{font:750 13px Arial;fill:#4d5563}
@@ -99,7 +114,7 @@
     .columns{position:relative;width:201px;margin:4px auto 0;display:grid;grid-template-columns:repeat(3,67px);text-align:center;font:bold 39px/1.25 monospace}
     .input-links{position:absolute;inset:0;width:100%;min-width:0;height:100%;background:transparent;overflow:visible;pointer-events:none;z-index:2}
     .input-links path{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-    .input-links text{font:800 11px Arial, sans-serif;fill:var(--ink);text-anchor:middle}
+    .input-links text{font:800 16px Arial, sans-serif;fill:var(--ink);text-anchor:middle}
     .row-label{position:absolute;right:-32px;font:800 14px/1 monospace}
     .row-label.a{top:91px;color:var(--purple)}
     .row-label.b{top:140px;color:var(--blue)}
@@ -137,10 +152,12 @@
     .work-row{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,67px);height:62px;align-items:center;margin:3px 0}
     .work-row[hidden]{display:none}
     .work-chip{grid-column:2;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:8px;background:var(--ink);color:#fff;height:58px}
-    .work-chip small{font:750 10px/1.2 Arial;white-space:nowrap}
+    .work-chip mark{background:#ffeb80;color:var(--ink);padding:0 2px;border-radius:2px}
+    .work-chip small{font:750 14px/1.2 Arial;white-space:nowrap}
     .work-chip strong{font:850 29px/1.15 monospace}
     .work-chip.result{border-color:var(--result);background:var(--result)}
     .work-chip.carry{border-color:var(--green);background:var(--green)}
+    .work-chip.inactive{background:#fff;color:#111}
     .steps{display:grid;gap:5px}
     .step{width:100%;text-align:left;display:grid;grid-template-columns:25px 1fr;gap:9px;align-items:center;padding:6px 9px;border:1px solid var(--line);background:#fff;border-radius:9px;cursor:pointer;color:var(--muted)}
     .step:hover{border-color:#b09ad1}
@@ -157,6 +174,30 @@
     .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
     .legend .a{background:var(--purple)}.legend .b{background:var(--blue)}.legend .carry{background:var(--green)}.legend .result{background:var(--result)}.legend .other{background:var(--ink)}
     .site-footer{margin-top:16px;text-align:right;color:var(--muted);font-size:12px}
+    /* Larger reading text; gate names and calculation geometry retain their sizes. */
+    body{font-size:18px}
+    h1{font-size:clamp(25px,2.6vw,35px)}
+    .eyebrow{font-size:14px}
+    .subtitle,.panel-header p{font-size:16px}
+    .panel-header h2{font-size:22px}
+    .step-count{font-size:15px}
+    .number{font-size:16px}
+    .board-title{font-size:21px}
+    .board-note,.small-label{font-size:16px}
+    .signal-number{font-size:21px}
+    .callout{font-size:18px}
+    .place-names{font-size:15px}
+    .row-label{font-size:16px}
+    .read-result{font-size:17px}
+    .read-result strong{font-size:23px}
+    .work-chip small{font-size:16px}
+    .step{padding:8px 10px;grid-template-columns:28px 1fr}
+    .step-number{width:27px;height:27px;font-size:15px}
+    .step strong,.explanation strong{font-size:17px}
+    .step small{font-size:15px;line-height:1.4}
+    .explanation p{font-size:17px;line-height:1.5}
+    .legend{font-size:15px}
+    .site-footer{font-size:14px}
     @media(max-width:1120px){.grid{grid-template-columns:1fr}.right-content{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(290px,1.2fr);align-items:start}.addition{grid-row:span 2}.legend{grid-column:1/-1}}
     @media(max-width:700px){.app{padding:13px 10px 25px}.subtitle{display:none}.controls{flex-wrap:wrap}.control-label{width:100%}.step-count{margin-right:auto}.right-content{display:flex}.diagram-scroll svg{min-width:690px}}
     @media(prefers-reduced-motion:reduce){.wire.current{animation:none}}
@@ -196,8 +237,8 @@
           <path id="haCarryToXor2" class="wire carry" d="M523 625 H556"/>
           <path id="haCarryBranch" class="wire carry" d="M523 625 V714 H556"/>
           <text id="carryCallout" class="callout" x="492" y="350">C₁ = <tspan class="result-number">1</tspan> →</text>
-          <g id="haXor" class="gate"><path class="gate-shape" d="M258 103 Q290 146 258 189 Q323 183 367 146 Q323 109 258 103 Z"/><path class="gate-shape" d="M247 103 Q280 146 247 189" fill="none"/><text class="gate-name" x="315" y="146">XOR</text><rect class="value-backdrop" x="322" y="151" width="15" height="17" rx="3"/><text class="gate-value" x="315" y="164">1⊕1=<tspan class="result-number">0</tspan></text></g>
-          <g id="haAnd" class="gate carry"><path class="gate-shape" d="M258 205 H313 A44 44 0 0 1 313 293 H258 Z"/><text class="gate-name" x="309" y="248">AND</text><rect class="value-backdrop carry" x="316" y="254" width="15" height="17" rx="3"/><text class="gate-value" x="309" y="267">1·1=<tspan class="result-number carry">1</tspan></text></g>
+          <g id="haXor" class="gate"><path class="gate-shape" d="M258 103 Q290 146 258 189 Q323 183 367 146 Q323 109 258 103 Z"/><path class="gate-shape" d="M247 103 Q280 146 247 189" fill="none"/><text class="gate-name" x="315" y="146">XOR</text></g>
+          <g id="haAnd" class="gate carry"><path class="gate-shape" d="M258 205 H313 A44 44 0 0 1 313 293 H258 Z"/><text class="gate-name" x="309" y="248">AND</text></g>
           <g><circle id="circuitA0" class="signal input-a on" cx="78" cy="125" r="22"/><text class="signal-number" x="78" y="125">1</text><text class="small-label input-a" x="52" y="96">A₀</text></g>
           <g><circle id="circuitB0" class="signal input-b on" cx="78" cy="245" r="22"/><text class="signal-number" x="78" y="245">1</text><text class="small-label input-b" x="52" y="216">B₀</text></g>
           <g id="s0Node" class="output-node"><circle id="s0Circle" class="signal" cx="755" cy="146" r="22"/><text class="signal-number" x="755" y="146">0</text><text class="small-label sum" x="782" y="151">S₀</text></g>
@@ -206,20 +247,24 @@
           <path id="faBtoX" class="wire b" d="M100 596 H172 V550 H258"/>
           <path id="faAtoAnd" class="wire a" d="M160 510 V745 H258"/>
           <path id="faBtoAnd" class="wire b" d="M172 596 V783 H258"/>
-          <path id="faXtoX" class="wire other" d="M367 530 H475 V592"/>
+          <path id="faXtoTemp" class="wire other" d="M367 530 H475"/>
+          <path id="faXtoX" class="wire other" d="M475 530 V592"/>
           <path id="faXtoXBranch" class="wire other" d="M475 592 H556"/>
           <path id="faXtoAnd" class="wire other" d="M475 592 V681 H556"/>
           <path id="faSumWire" class="wire result" d="M662 605 H733"/>
-          <path id="faAnd1toOr" class="wire other" d="M367 763 H685 V746 H724"/>
-          <path id="faAnd2toOr" class="wire other" d="M662 708 H685 V765 H724"/>
+          <path id="faAnd1toOr" class="wire carry" d="M367 763 H685 V746 H724"/>
+          <path id="faAnd2toOr" class="wire carry" d="M662 708 H685 V765 H724"/>
           <path id="faCarryOutWire" class="wire result" d="M780 755 H798"/>
-          <g id="faXor1" class="gate"><path class="gate-shape" d="M258 487 Q290 530 258 573 Q323 567 367 530 Q323 493 258 487 Z"/><path class="gate-shape" d="M247 487 Q280 530 247 573" fill="none"/><text class="gate-name" x="315" y="529">XOR</text><rect class="value-backdrop other" x="322" y="535" width="15" height="17" rx="3"/><text class="gate-value" x="315" y="548">1⊕0=<tspan class="result-number other">1</tspan></text></g>
-          <g id="faAnd1" class="gate carry"><path class="gate-shape" d="M258 718 H313 A44 44 0 0 1 313 806 H258 Z"/><text class="gate-name" x="309" y="761">AND</text><rect class="value-backdrop other" x="316" y="767" width="15" height="17" rx="3"/><text class="gate-value" x="309" y="780">1·0=<tspan class="result-number other">0</tspan></text></g>
-          <g id="faXor2" class="gate"><path class="gate-shape" d="M556 562 Q588 605 556 648 Q620 642 662 605 Q620 568 556 562 Z"/><path class="gate-shape" d="M545 562 Q578 605 545 648" fill="none"/><text class="gate-name" x="612" y="604">XOR</text><rect class="value-backdrop" x="619" y="610" width="15" height="17" rx="3"/><text class="gate-value" x="612" y="623">1⊕1=<tspan class="result-number">0</tspan></text></g>
-          <g id="faAnd2" class="gate carry"><path class="gate-shape" d="M556 666 H610 A42 42 0 0 1 610 750 H556 Z"/><text class="gate-name" x="605" y="707">AND</text><rect class="value-backdrop other" x="612" y="713" width="15" height="17" rx="3"/><text class="gate-value" x="605" y="726">1·1=<tspan class="result-number other">1</tspan></text></g>
-          <g id="faOr" class="gate carry"><path class="gate-shape" d="M724 717 Q746 755 724 793 Q754 790 780 755 Q754 720 724 717 Z"/><text class="gate-name" x="749" y="755">OR</text><rect class="value-backdrop" x="756" y="760" width="15" height="17" rx="3"/><text class="gate-value" x="749" y="773">0∨1=<tspan class="result-number">1</tspan></text></g>
+          <g id="faXor1" class="gate"><path class="gate-shape" d="M258 487 Q290 530 258 573 Q323 567 367 530 Q323 493 258 487 Z"/><path class="gate-shape" d="M247 487 Q280 530 247 573" fill="none"/><text class="gate-name" x="315" y="529">XOR</text></g>
+          <g id="faAnd1" class="gate carry"><path class="gate-shape" d="M258 718 H313 A44 44 0 0 1 313 806 H258 Z"/><text class="gate-name" x="309" y="761">AND</text></g>
+          <g id="faXor2" class="gate"><path class="gate-shape" d="M556 562 Q588 605 556 648 Q620 642 662 605 Q620 568 556 562 Z"/><path class="gate-shape" d="M545 562 Q578 605 545 648" fill="none"/><text class="gate-name" x="612" y="604">XOR</text></g>
+          <g id="faAnd2" class="gate carry"><path class="gate-shape" d="M556 666 H610 A42 42 0 0 1 610 750 H556 Z"/><text class="gate-name" x="605" y="707">AND</text></g>
+          <g id="faOr" class="gate carry"><path class="gate-shape" d="M724 717 Q746 755 724 793 Q754 790 780 755 Q754 720 724 717 Z"/><text class="gate-name" x="749" y="755">OR</text></g>
           <g><circle id="circuitA1" class="signal input-a on" cx="78" cy="510" r="22"/><text class="signal-number" x="78" y="510">1</text><text class="small-label input-a" x="52" y="481">A₁</text></g>
           <g><circle id="circuitB1" class="signal input-b" cx="78" cy="596" r="22"/><text class="signal-number" x="78" y="596">0</text><text class="small-label input-b" x="52" y="568">B₁</text></g>
+          <g id="xNode" class="temporary-node" aria-label="Temporary value X equals 1"><circle class="signal" cx="475" cy="530" r="22"/><text class="signal-number" x="475" y="530">1</text></g>
+          <g id="pNode" class="temporary-node carry" aria-label="Carry value P equals 0"><circle class="signal" cx="430" cy="763" r="22"/><text class="signal-number" x="430" y="763">0</text></g>
+          <g id="qNode" class="temporary-node carry" aria-label="Carry value Q equals 1"><circle class="signal" cx="685" cy="708" r="17"/><text class="signal-number" x="685" y="708">1</text></g>
           <g id="s1Node" class="output-node"><circle id="s1Circle" class="signal" cx="755" cy="605" r="22"/><text class="signal-number" x="755" y="605">0</text><text class="small-label sum" x="782" y="610">S₁</text></g>
           <g id="c2Node" class="output-node"><circle id="c2Circle" class="signal carry" cx="815" cy="755" r="17"/><text class="signal-number" x="815" y="755">1</text></g>
           <text class="small-label final-result" x="671" y="817">C₂ (final carry)</text>
@@ -232,7 +277,7 @@
         <div class="addition">
           <div class="place-names"><span>4s</span><span>2s</span><span>1s</span></div>
           <div class="columns" id="additionColumns" aria-label="11 base two plus 01 base two equals 100 base two">
-            <svg class="input-links" aria-hidden="true"><path id="inputLinkPath"/><g id="inputOperation" visibility="hidden"><rect id="inputOperationBg" rx="3" fill="#fff"/><text id="inputOperationText">XOR</text></g></svg>
+            <svg class="input-links" aria-hidden="true"><defs><marker id="resultArrowHead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><polygon points="0,0 10,5 0,10" fill="#171923"/></marker></defs><path id="inputLinkPath"/><path id="operationResultPath" marker-end="url(#resultArrowHead)"/><g id="inputOperation" visibility="hidden"><rect id="inputOperationBg" rx="3" fill="#ffeb80"/><text id="inputOperationText">XOR</text></g></svg>
             <div class="carry-row carry-stack" id="carryStack"><div class="carry-digit carry-candidate" id="carryCandidate" hidden aria-label="P equals 0, the first carry candidate"><small>P</small><span>0</span></div><div class="carry-digit carry-candidate" id="carryCandidateQ" hidden aria-label="Q equals 1, the second carry candidate"><small>Q</small><span>1</span></div><div class="final-carry-value" id="carryFinal" hidden aria-label="Final carry equals 1">1</div></div><div class="carry-row carry-digit" id="carryInDisplay">·</div><div class="carry-row"></div>
             <span class="blank">0</span><span id="a1Digit" class="input-bit a">1</span><span id="a0Digit" class="input-bit a">1</span>
             <span class="operator">+</span><span class="row-label a">A</span><span class="row-label b">B</span><span class="blank">0</span><span id="b1Digit" class="input-bit b">0</span><span id="b0Digit" class="input-bit b">1</span>
@@ -282,12 +327,15 @@
   const workValues={4:['X · XOR₁','1'],5:['X · XOR₂','1'],7:['X · AND₂','1']};
   const inputPairs={1:['a0Digit','b0Digit'],2:['a0Digit','b0Digit'],4:['a1Digit','b1Digit'],5:['carryInDisplay','workChip'],6:['a1Digit','b1Digit'],7:['carryInDisplay','workChip'],8:['carryCandidate','carryCandidateQ']};
   const inputOperations={1:'XOR',2:'AND',4:'XOR₁',5:'XOR₂',6:'AND₁',7:'AND₂',8:'OR'};
+  const operationResults={1:'answer0',2:'carryInDisplay',4:'workChip',5:'answer1',6:'carryCandidate',7:'carryCandidateQ',8:'answer2'};
   function setClass(id,cls,on){$(id).classList.toggle(cls,on)}
   function paint(id,available,current){setClass(id,'on',step>=available);setClass(id,'current',step===current)}
   function drawInputLinks(){
     const path=$('inputLinkPath');
     const pair=inputPairs[step];
     const operation=$('inputOperation');
+    const resultPath=$('operationResultPath');
+    resultPath.setAttribute('d','');
     if(!pair){path.setAttribute('d','');operation.setAttribute('visibility','hidden');return}
     const nodes=pair.map($);
     if(nodes.some(node=>node.hidden||!node.getBoundingClientRect)){path.setAttribute('d','');operation.setAttribute('visibility','hidden');return}
@@ -297,27 +345,47 @@
       const box=node.getBoundingClientRect();
       return {x:(right?box.right:box.left)-column.left+(right?2:-2),y:(box.top+box.bottom)/2-column.top};
     });
-    const tipX=right?Math.max(...points.map(p=>p.x))+17:Math.max(-20,Math.min(...points.map(p=>p.x))-32);
+    const tipX=right?Math.max(...points.map(p=>p.x))+42:Math.min(...points.map(p=>p.x))-48;
     const midY=(points[0].y+points[1].y)/2;
     const inset=right?5:-5;
     path.setAttribute('d',points.map(p=>`M ${p.x} ${p.y} L ${p.x+inset} ${p.y} L ${tipX} ${midY}`).join(' '));
     const label=inputOperations[step];
-    const labelWidth=label.length*7+8;
+    const labelWidth=label.length*10+12;
     $('inputOperationText').textContent=label;
     $('inputOperationText').setAttribute('x',tipX);
-    $('inputOperationText').setAttribute('y',midY+4);
-    for(const [key,value] of Object.entries({x:tipX-labelWidth/2,y:midY-9,width:labelWidth,height:18}))$('inputOperationBg').setAttribute(key,value);
+    $('inputOperationText').setAttribute('y',midY+6);
+    for(const [key,value] of Object.entries({x:tipX-labelWidth/2,y:midY-13,width:labelWidth,height:26}))$('inputOperationBg').setAttribute(key,value);
+    const result=$(operationResults[step]).getBoundingClientRect();
+    const endX=(right?result.right+5:result.left-5)-column.left;
+    const endY=(result.top+result.bottom)/2-column.top;
+    const startY=midY+(endY>=midY?15:-15);
+    const bendX=tipX+(right?22:-22);
+    if(step===6||step===7){
+      // Approach the carry candidate from outside the entire addition column.
+      // The gate label sits beside the 2s inputs, while P and Q occupy the 4s column.
+      const targetX=result.left-column.left-3;
+      const routeX=Math.min(tipX-labelWidth/2-20,targetX-35);
+      resultPath.setAttribute('d',`M ${tipX-labelWidth/2-3} ${midY} C ${routeX} ${midY}, ${routeX} ${endY}, ${targetX} ${endY}`);
+    }else{
+      resultPath.setAttribute('d',`M ${tipX} ${startY} C ${bendX} ${endY}, ${bendX} ${endY}, ${endX} ${endY}`);
+    }
     operation.setAttribute('visibility','visible');
   }
   function render(){
+    setClass('circuit','completed-circuit',step===9);
     $('stepCount').textContent='Step '+step+' of 9';
     $('previous').disabled=step===0;
     $('next').textContent=step===0?'Start':step===9?'Replay':'Next Gate';
     $('explainTitle').textContent=steps[step][0];
     $('explainText').textContent=steps[step][1];
     $('workRow').hidden=!workValues[step];
+    setClass('workChip','inactive',false);
     if(workValues[step]){
-      $('workLabel').textContent=workValues[step][0];
+      if(step===4||step===5||step===7){
+        $('workLabel').textContent='Temp';
+      }else{
+        $('workLabel').replaceChildren(document.createTextNode('X · '),Object.assign(document.createElement('mark'),{textContent:inputOperations[step]}));
+      }
       $('workDigit').textContent=workValues[step][1];
     }
     for(const [id,active] of [
@@ -361,17 +429,28 @@
     setClass('haCarryToXor2','current',step===3||step===5);
     setClass('haCarryBranch','current',step===3||step===7);
     for(const id of ['faAtoX','faBtoX','faXor1'])paint(id,4,4);
-    for(const id of ['faXtoX','faXtoXBranch','faSumWire','faXor2'])paint(id,5,5);
-    setClass('faXtoX','current',step===5||step===7);
+    paint('faXtoTemp',4,4);
+    setClass('faXtoTemp','current',step===4||step===5||step===7);
+    for(const id of ['faXtoX','faXtoXBranch'])paint(id,4,4);
+    for(const id of ['faSumWire','faXor2'])paint(id,5,5);
+    setClass('faXtoX','current',step===4||step===5||step===7);
+    setClass('faXtoXBranch','current',step===4||step===5);
     for(const id of ['faAtoAnd','faBtoAnd','faAnd1toOr','faAnd1'])paint(id,6,6);
     for(const id of ['faXtoAnd','faAnd2toOr','faAnd2'])paint(id,7,7);
+    setClass('faAnd1toOr','current',step===6||step===8);
+    setClass('faAnd2toOr','current',step===7||step===8);
     for(const id of ['faCarryOutWire','faOr'])paint(id,8,8);
     setClass('faXor1','reused',step===5||step===7);
+    setClass('xNode','revealed',step>=4);
+    setClass('xNode','inactive',step===6||step===8);
+    setClass('pNode','revealed',step>=6);
+    setClass('pNode','inactive',step===7);
+    setClass('qNode','revealed',step>=7);
     setClass('faAnd1','reused',step===8);
     setClass('faAnd2','reused',step===8);
     for(const [id,n] of [['s0Circle',1],['c1Circle',2],['s1Circle',5],['c2Circle',8]])setClass(id,'on',step>=n);
     for(const [id,n] of [['s0Node',1],['c1Node',2],['s1Node',5],['c2Node',8]])setClass(id,'revealed',step>=n);
-    for(const [id,active] of [['s0Node',step===1],['c1Node',step===2||step===3],['s1Node',step===5],['c2Node',step===8]])setClass(id,'current',active);
+    for(const [id,active] of [['s0Node',step===1||step===9],['c1Node',step===2||step===3||step===5||step===7],['s1Node',step===5||step===9],['c2Node',step===8||step===9]])setClass(id,'current',active);
     setClass('carryCallout','revealed',step>=2);
     document.querySelectorAll('.step').forEach(el=>{let n=Number(el.dataset.step);el.classList.toggle('active',n===step);el.classList.toggle('done',n<step);el.setAttribute('aria-current',n===step?'step':'false');const hint=el.querySelector('small');if(hint){hint.hidden=n>step;}});
     drawInputLinks();

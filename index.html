@@ -199,7 +199,35 @@
     .legend{font-size:15px}
     .site-footer{font-size:14px}
     @media(max-width:1120px){.grid{grid-template-columns:1fr}.right-content{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(290px,1.2fr);align-items:start}.addition{grid-row:span 2}.legend{grid-column:1/-1}}
-    @media(max-width:700px){.app{padding:13px 10px 25px}.subtitle{display:none}.controls{flex-wrap:wrap}.control-label{width:100%}.step-count{margin-right:auto}.right-content{display:flex}.diagram-scroll svg{min-width:690px}}
+    @media(max-width:700px){
+      .app{padding:12px 8px 24px}
+      header{gap:10px;margin-bottom:12px}
+      .brand{gap:9px;min-width:0}
+      .logo{width:38px;height:38px;flex-shrink:0}
+      h1{font-size:clamp(21px,5.5vw,29px);line-height:1.2}
+      .eyebrow{font-size:11px}
+      .subtitle{display:none}
+      .controls{flex-wrap:wrap;padding:10px;gap:8px}
+      .control-label{flex:1 1 55%;font-size:17px}
+      .step-count{margin:0;font-size:13px}
+      .btn{flex:1;min-height:44px;padding:10px 8px;font-size:16px}
+      .btn.primary{min-width:0}
+      .grid{gap:12px}
+      .panel-header{padding:12px;gap:8px}
+      .panel-header h2{font-size:20px}
+      .panel-header p{font-size:14px;line-height:1.4}
+      .diagram-scroll svg{min-width:0;width:100%}
+      .right-content{display:flex;padding:10px;gap:12px}
+      .addition{padding:16px 8px;overflow-x:auto}
+      .addition .place-names,.addition .columns{position:relative;left:0}
+      .steps{gap:7px}
+      .step{min-height:48px;padding:10px}
+      .step strong{font-size:16px}
+      .step small{font-size:14px}
+      .explanation p{font-size:16px}
+      .legend{gap:10px;font-size:14px}
+      .site-footer{text-align:center;font-size:12px;line-height:1.5}
+    }
     @media(prefers-reduced-motion:reduce){.wire.current{animation:none}}
   </style>
 </head>
